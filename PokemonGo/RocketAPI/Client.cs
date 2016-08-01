@@ -212,44 +212,45 @@ namespace PokemonGo.RocketAPI
             // Use better balls for high CP pokemon
             if (masterBallsCount > 0 && pokemonCP >= 1000)
             {
-                ColoredConsoleWrite(ConsoleColor.Green, $"Master Ball is being used");
+                ColoredConsoleWrite(ConsoleColor.Green, $"Master Ball is being used. You have {masterBallsCount} left.");
                 return MiscEnums.Item.ITEM_MASTER_BALL;
             }
 
             if (ultraBallsCount > 0 && pokemonCP >= 600)
             {
-                ColoredConsoleWrite(ConsoleColor.Green, $"Ultra Ball is being used");
+                ColoredConsoleWrite(ConsoleColor.Green, $"Ultra Ball is being used. You have {ultraBallsCount} left.");
                 return MiscEnums.Item.ITEM_ULTRA_BALL;
             }
 
             if (greatBallsCount > 0 && pokemonCP >= 350)
             {
-                ColoredConsoleWrite(ConsoleColor.Green, $"Great Ball is being used");
+                ColoredConsoleWrite(ConsoleColor.Green, $"Great Ball is being used. You have {greatBallsCount} left.");
                 return MiscEnums.Item.ITEM_GREAT_BALL;
             }
 
             // If low CP pokemon, but no more pokeballs; only use better balls if pokemon are of semi-worthy quality
             if (pokeBallsCount > 0)
             {
-                ColoredConsoleWrite(ConsoleColor.Green, $"Poke Ball is being used");
+                ColoredConsoleWrite(ConsoleColor.Green, $"Poke Ball is being used. You have {pokeBallsCount} left.");
                 return MiscEnums.Item.ITEM_POKE_BALL;
             }
             else if ((greatBallsCount < 40 && pokemonCP >= 200) || greatBallsCount >= 40)
             {
-                ColoredConsoleWrite(ConsoleColor.Green, $"Great Ball is being used");
+                ColoredConsoleWrite(ConsoleColor.Green, $"Great Ball is being used. You have {greatBallsCount} left.");
                 return MiscEnums.Item.ITEM_GREAT_BALL;
             }
             else if (ultraBallsCount > 0 && pokemonCP >= 500)
             {
-                ColoredConsoleWrite(ConsoleColor.Green, $"Ultra Ball is being used");
+                ColoredConsoleWrite(ConsoleColor.Green, $"Ultra Ball is being used. You have {ultraBallsCount} left.");
                 return MiscEnums.Item.ITEM_ULTRA_BALL;
             }
             else if (masterBallsCount > 0 && pokemonCP >= 700)
             {
-                ColoredConsoleWrite(ConsoleColor.Green, $"Master Ball is being used");
+                ColoredConsoleWrite(ConsoleColor.Green, $"Master Ball is being used. You have {masterBallsCount} left.");
                 return MiscEnums.Item.ITEM_MASTER_BALL;
             }
 
+            ColoredConsoleWrite(ConsoleColor.Green, $"Poke Ball is being used. You have {pokeBallsCount} left.");
             return MiscEnums.Item.ITEM_POKE_BALL;
         }
 
@@ -389,8 +390,6 @@ namespace PokemonGo.RocketAPI
         {
             _currentLat = lat;
             _currentLng = lng;
-            //            _settings.DefaultLatitude = lat;
-            //            _settings.DefaultLongitude = lng;
         }
 
         public async Task SetServer()
@@ -407,6 +406,11 @@ namespace PokemonGo.RocketAPI
             };
 
             _apiUrl = serverResponse.ApiUrl;
+        }
+
+        public bool HasServerSet()
+        {
+            return _apiUrl != null;
         }
 
         public async Task<TransferPokemonOut> TransferPokemon(ulong pokemonId)
@@ -542,7 +546,7 @@ namespace PokemonGo.RocketAPI
             IEnumerable<Item> myItems = await GetItems(client);
             IEnumerable<Item> RazzBerries = myItems.Where(i => (ItemId)i.Item_ == ItemId.ItemRazzBerry);
             Item RazzBerry = RazzBerries.FirstOrDefault();
-            if (RazzBerry != null)
+            if (RazzBerry != null && RazzBerry.Count > 0)
             {
                 UseItemCaptureRequest useRazzBerry = await client.UseCaptureItem(encounterId, AllEnum.ItemId.ItemRazzBerry, spawnPointGuid);
                 ColoredConsoleWrite(ConsoleColor.Green, $"Using a Razz Berry, we have {RazzBerry.Count} left");

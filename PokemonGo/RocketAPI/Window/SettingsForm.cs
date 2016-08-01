@@ -9,12 +9,20 @@ using System.Windows.Forms;
 using GMap.NET.MapProviders;
 using GMap.NET;
 using System.Configuration;
-using System.Globalization;
+using System.Globalization; 
+using GMap.NET.WindowsForms;
+using PokemonGo.RocketAPI.Helpers;
+using GMap.NET.WindowsForms.Markers;
+
 
 namespace PokemonGo.RocketAPI.Window
 {
     partial class SettingsForm : Form
     {
+        GMapOverlay searchAreaOverlay = new GMapOverlay("areas");
+        GMapOverlay playerOverlay = new GMapOverlay("players");
+        GMarkerGoogle playerMarker;
+
         public SettingsForm()
         {
             InitializeComponent();
@@ -43,7 +51,7 @@ namespace PokemonGo.RocketAPI.Window
             evolveAllChk.Checked = Settings.Instance.EvolveAllGivenPokemons;
             CatchPokemonBox.Checked = Settings.Instance.CatchPokemon;
             TravelSpeedBox.Text = Settings.Instance.TravelSpeed.ToString();
-           // ImageSizeBox.Text = Settings.Instance.ImageSize.ToString();
+
             // Initialize map:
             //use google provider
             gMapControl1.MapProvider = GoogleMapProvider.Instance;
@@ -57,16 +65,23 @@ namespace PokemonGo.RocketAPI.Window
             lat.Replace(',', '.');
             longit.Replace(',', '.');
             gMapControl1.Position = new PointLatLng(double.Parse(lat.Replace(",", "."), CultureInfo.InvariantCulture), double.Parse(longit.Replace(",", "."), CultureInfo.InvariantCulture));
-
-
-
+            
             //zoom min/max; default both = 2
             gMapControl1.DragButton = MouseButtons.Left;
+            gMapControl1.IgnoreMarkerOnMouseWheel = true;
 
             gMapControl1.CenterPen = new Pen(Color.Red, 2);
             gMapControl1.MinZoom = trackBar.Maximum = 1;
             gMapControl1.MaxZoom = trackBar.Maximum = 20;
             trackBar.Value = 10;
+
+            gMapControl1.Overlays.Add(searchAreaOverlay);
+            gMapControl1.Overlays.Add(playerOverlay);
+            
+            playerMarker = new GMarkerGoogle(gMapControl1.Position, GMarkerGoogleType.orange_small);
+            playerOverlay.Markers.Add(playerMarker);
+            
+            S2GMapDrawer.DrawS2Cells(S2Helper.GetNearbyCellIds(gMapControl1.Position.Lng, gMapControl1.Position.Lat), searchAreaOverlay);
 
             //set zoom
             gMapControl1.Zoom = trackBar.Value;
@@ -99,10 +114,11 @@ namespace PokemonGo.RocketAPI.Window
             Settings.Instance.SetSetting(transferCpThresText.Text, "TransferCPThreshold");
             Settings.Instance.SetSetting(transferIVThresText.Text, "TransferIVThreshold");
             Settings.Instance.SetSetting(TravelSpeedBox.Text, "TravelSpeed");
-            //Settings.Instance.SetSetting(ImageSizeBox.Text, "ImageSize");
             Settings.Instance.SetSetting(evolveAllChk.Checked ? "true" : "false", "EvolveAllGivenPokemons");
             Settings.Instance.SetSetting(CatchPokemonBox.Checked ? "true" : "false", "CatchPokemon");
             Settings.Instance.Reload();
+
+            MainForm.Instance.RestartBot();
 
             Close();
         }
@@ -121,20 +137,72 @@ namespace PokemonGo.RocketAPI.Window
 
         private void gMapControl1_MouseClick(object sender, MouseEventArgs e)
         {
-            Point localCoordinates = e.Location;
-            gMapControl1.Position = gMapControl1.FromLocalToLatLng(localCoordinates.X, localCoordinates.Y);
-
-            if (e.Clicks >= 2)
+            if (gMapControl1.IsDragging) return;
+            if (e.Button == MouseButtons.Left)
             {
-                gMapControl1.Zoom += 5;
-            }
+                Point localCoordinates = e.Location;
+                PointLatLng clickedCoord = gMapControl1.FromLocalToLatLng(localCoordinates.X, localCoordinates.Y);
+                
+                if (e.Clicks == 1)
+                {
+                    double X = Math.Round(clickedCoord.Lng, 6);
+                    double Y = Math.Round(clickedCoord.Lat, 6);
+                    string longitude = X.ToString();
+                    string latitude = Y.ToString();
+                    latitudeText.Text = latitude;
+                    longitudeText.Text = longitude;
 
-            double X = Math.Round(gMapControl1.Position.Lng, 6);
-            double Y = Math.Round(gMapControl1.Position.Lat, 6);
-            string longitude = X.ToString();
-            string latitude = Y.ToString();
-            latitudeText.Text = latitude;
-            longitudeText.Text = longitude;
+                    moveTo(clickedCoord);
+                }
+            }
+        }
+
+        private void latitudeText_TextChanged(object sender, EventArgs e)
+        {
+            if (playerMarker == null) return;
+
+            double newLat;
+            if (double.TryParse(latitudeText.Text, out newLat))
+            {
+                moveTo(new PointLatLng(Math.Round(newLat, 6), playerMarker.Position.Lng), true);
+            }
+            //latitudeText.Text = Math.Round(playerMarker.Position.Lng, 6).ToString();
+        }
+
+        private void longitudeText_TextChanged(object sender, EventArgs e)
+        {
+            if (playerMarker == null) return;
+
+            double newLng;
+            if (double.TryParse(longitudeText.Text, out newLng))
+            {
+                moveTo(new PointLatLng(playerMarker.Position.Lat, Math.Round(newLng, 6)), true);
+            }
+            //latitudeText.Text = Math.Round(playerMarker.Position.Lat, 6).ToString();
+        }
+
+        private void moveTo(PointLatLng pos, bool shouldFocus = false)
+        {
+            if (shouldFocus)
+            {
+                gMapControl1.Position = pos;
+            }
+            playerMarker.Position = pos;
+
+            searchAreaOverlay.Polygons.Clear();
+            S2GMapDrawer.DrawS2Cells(S2Helper.GetNearbyCellIds(pos.Lng, pos.Lat), searchAreaOverlay);
+        }
+
+        private void gMapControl1_OnMapZoomChanged()
+        {
+            trackBar.Value = (int)gMapControl1.Zoom;
+        }
+
+        private void gMapControl1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            PointLatLng clickedCoord = gMapControl1.FromLocalToLatLng(e.Location.X, e.Location.Y);
+            gMapControl1.Position = clickedCoord;
+            gMapControl1.Zoom += 5;
         }
 
         private void trackBar_Scroll(object sender, EventArgs e)
@@ -146,25 +214,6 @@ namespace PokemonGo.RocketAPI.Window
         {
             gMapControl1.SetPositionByKeywords(AdressBox.Text);
             gMapControl1.Zoom = 15;
-        }
-
-        private void authTypeLabel_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void textBox1_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label6_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void transferCpThresText_TextChanged(object sender, EventArgs e)
-        {
         }
 
         private void transferTypeCb_SelectedIndexChanged(object sender, EventArgs e)
@@ -195,16 +244,6 @@ namespace PokemonGo.RocketAPI.Window
 
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void gMapControl1_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void FindAdressButton_Click_1(object sender, EventArgs e)
         {
             gMapControl1.SetPositionByKeywords(AdressBox.Text);
@@ -215,31 +254,8 @@ namespace PokemonGo.RocketAPI.Window
             string latitude = Y.ToString();
             latitudeText.Text = latitude;
             longitudeText.Text = longitude;
-        }
 
-        private void panel1_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void evolveAllChk_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label7_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-
+            moveTo(gMapControl1.Position, true);
         }
     }
 }
