@@ -528,6 +528,7 @@ namespace PokemonGo.RocketAPI.Window
             var fortInfo = await botClient.GetFort(pokeStop.Id, pokeStop.Latitude, pokeStop.Longitude);
             var fortSearch = await botClient.SearchFort(pokeStop.Id, pokeStop.Latitude, pokeStop.Longitude);
             await TryUnban(pokeStop, fortInfo, fortSearch);
+            pokeStop.CooldownCompleteTimestampMs = DateTime.UtcNow.ToUnixTime() + 300000;
         }
 
         private async Task TryUnban(FortData pokeStop, FortDetailsResponse fortInfo, FortSearchResponse fortSearch)
