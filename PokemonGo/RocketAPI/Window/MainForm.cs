@@ -1144,12 +1144,16 @@ namespace PokemonGo.RocketAPI.Window
 
         #region POKEMON LIST
         private IEnumerable<PokemonFamily> families;
-        private static int TransferButtonColumnIndex = 7;
-        private static int PowerUpButtonColumnIndex = PowerUpButtonColumnIndex + 1;
-        private static int EvolveButtonColumnIndex = EvolveButtonColumnIndex + 1;
+        private static int TransferButtonColumnIndex;
+        private static int PowerUpButtonColumnIndex;
+        private static int EvolveButtonColumnIndex;
 
         private void InitializePokemonForm()
         {
+            TransferButtonColumnIndex = 7;
+            PowerUpButtonColumnIndex = PowerUpButtonColumnIndex + 1;
+            EvolveButtonColumnIndex = EvolveButtonColumnIndex + 1;
+
             objectListView1.ButtonClick += PokemonListButton_Click;
 
             pkmnName.ImageGetter = delegate (object rowObject)
