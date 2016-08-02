@@ -41,6 +41,8 @@ namespace PokemonGo.RocketAPI.Window
             this.showAllToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.gMapControl1 = new GMap.NET.WindowsForms.GMapControl();
             this.objectListView1 = new BrightIdeasSoftware.ObjectListView();
+            this.nthRow = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
+            this.pkmnNo = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.pkmnName = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.pkmnCP = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.pkmnAtkIV = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
@@ -53,7 +55,6 @@ namespace PokemonGo.RocketAPI.Window
             this.largePokemonImageList = new System.Windows.Forms.ImageList(this.components);
             this.smallPokemonImageList = new System.Windows.Forms.ImageList(this.components);
             this.button1 = new System.Windows.Forms.Button();
-            this.nthRow = ((BrightIdeasSoftware.OLVColumn)(new BrightIdeasSoftware.OLVColumn()));
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.objectListView1)).BeginInit();
@@ -71,7 +72,7 @@ namespace PokemonGo.RocketAPI.Window
             this.logTextBox.Location = new System.Drawing.Point(0, 26);
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
-            this.logTextBox.Size = new System.Drawing.Size(588, 326);
+            this.logTextBox.Size = new System.Drawing.Size(618, 326);
             this.logTextBox.TabIndex = 0;
             this.logTextBox.Text = "";
             this.logTextBox.TextChanged += new System.EventHandler(this.logTextBox_TextChanged);
@@ -83,7 +84,7 @@ namespace PokemonGo.RocketAPI.Window
             this.statusLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 640);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(894, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(924, 22);
             this.statusStrip1.SizingGrip = false;
             this.statusStrip1.TabIndex = 1;
             this.statusStrip1.Text = "statusStrip1";
@@ -103,7 +104,7 @@ namespace PokemonGo.RocketAPI.Window
             this.useLuckyEggToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(894, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(924, 24);
             this.menuStrip1.TabIndex = 2;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -147,7 +148,7 @@ namespace PokemonGo.RocketAPI.Window
             this.gMapControl1.GrayScaleMode = false;
             this.gMapControl1.HelperLineOption = GMap.NET.WindowsForms.HelperLineOptions.DontShow;
             this.gMapControl1.LevelsKeepInMemmory = 5;
-            this.gMapControl1.Location = new System.Drawing.Point(593, 26);
+            this.gMapControl1.Location = new System.Drawing.Point(623, 26);
             this.gMapControl1.MarkersEnabled = true;
             this.gMapControl1.MaxZoom = 2;
             this.gMapControl1.MinZoom = 2;
@@ -167,6 +168,7 @@ namespace PokemonGo.RocketAPI.Window
             // objectListView1
             // 
             this.objectListView1.AllColumns.Add(this.nthRow);
+            this.objectListView1.AllColumns.Add(this.pkmnNo);
             this.objectListView1.AllColumns.Add(this.pkmnName);
             this.objectListView1.AllColumns.Add(this.pkmnCP);
             this.objectListView1.AllColumns.Add(this.pkmnAtkIV);
@@ -182,6 +184,7 @@ namespace PokemonGo.RocketAPI.Window
             this.objectListView1.CellEditUseWholeCell = false;
             this.objectListView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.nthRow,
+            this.pkmnNo,
             this.pkmnName,
             this.pkmnCP,
             this.pkmnAtkIV,
@@ -200,15 +203,29 @@ namespace PokemonGo.RocketAPI.Window
             this.objectListView1.Name = "objectListView1";
             this.objectListView1.RowHeight = 32;
             this.objectListView1.ShowGroups = false;
-            this.objectListView1.Size = new System.Drawing.Size(894, 246);
+            this.objectListView1.Size = new System.Drawing.Size(924, 246);
             this.objectListView1.SmallImageList = this.smallPokemonImageList;
             this.objectListView1.TabIndex = 25;
             this.objectListView1.UseCompatibleStateImageBehavior = false;
             this.objectListView1.View = System.Windows.Forms.View.Details;
             // 
+            // nthRow
+            // 
+            this.nthRow.IsEditable = false;
+            this.nthRow.Text = "";
+            this.nthRow.Width = 30;
+            // 
+            // pkmnNo
+            // 
+            this.pkmnNo.AspectName = "PokemonId";
+            this.pkmnNo.AspectToStringFormat = "{0:d}";
+            this.pkmnNo.Text = "#";
+            this.pkmnNo.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.pkmnNo.Width = 30;
+            // 
             // pkmnName
             // 
-            this.pkmnName.AspectName = "PokemonId";
+            this.pkmnName.AspectName = "";
             this.pkmnName.AspectToStringFormat = "";
             this.pkmnName.Text = "Name";
             this.pkmnName.Width = 120;
@@ -217,32 +234,37 @@ namespace PokemonGo.RocketAPI.Window
             // 
             this.pkmnCP.AspectName = "Cp";
             this.pkmnCP.Text = "CP";
+            this.pkmnCP.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             this.pkmnCP.Width = 50;
             // 
             // pkmnAtkIV
             // 
             this.pkmnAtkIV.AspectName = "IndividualAttack";
             this.pkmnAtkIV.Text = "Atk IV";
-            this.pkmnAtkIV.Width = 50;
+            this.pkmnAtkIV.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.pkmnAtkIV.Width = 45;
             // 
             // pkmnDefIV
             // 
             this.pkmnDefIV.AspectName = "IndividualDefense";
             this.pkmnDefIV.Text = "Def IV";
-            this.pkmnDefIV.Width = 50;
+            this.pkmnDefIV.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.pkmnDefIV.Width = 45;
             // 
             // pkmnStaIV
             // 
             this.pkmnStaIV.AspectName = "IndividualStamina";
             this.pkmnStaIV.Text = "Sta IV";
-            this.pkmnStaIV.Width = 50;
+            this.pkmnStaIV.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.pkmnStaIV.Width = 45;
             // 
             // pkmnIV
             // 
             this.pkmnIV.AspectName = "GetIV";
-            this.pkmnIV.AspectToStringFormat = "{0:P2}";
+            this.pkmnIV.AspectToStringFormat = "{0:P0}";
             this.pkmnIV.Text = "IV %";
-            this.pkmnIV.Width = 50;
+            this.pkmnIV.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            this.pkmnIV.Width = 40;
             // 
             // pkmnTransferButton
             // 
@@ -286,22 +308,17 @@ namespace PokemonGo.RocketAPI.Window
             this.button1.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.button1.Location = new System.Drawing.Point(0, 610);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(894, 28);
+            this.button1.Size = new System.Drawing.Size(924, 28);
             this.button1.TabIndex = 26;
             this.button1.Text = "Refresh";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // nthRow
-            // 
-            this.nthRow.Text = "";
-            this.nthRow.Width = 30;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(894, 662);
+            this.ClientSize = new System.Drawing.Size(924, 662);
             this.Controls.Add(this.gMapControl1);
             this.Controls.Add(this.logTextBox);
             this.Controls.Add(this.button1);
@@ -353,5 +370,6 @@ namespace PokemonGo.RocketAPI.Window
         private BrightIdeasSoftware.OLVColumn pkmnPowerUpButton;
         private BrightIdeasSoftware.OLVColumn pkmnEvolveButton;
         private BrightIdeasSoftware.OLVColumn nthRow;
+        private BrightIdeasSoftware.OLVColumn pkmnNo;
     }
 }

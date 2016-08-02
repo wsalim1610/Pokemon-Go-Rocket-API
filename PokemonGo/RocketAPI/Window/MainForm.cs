@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -27,6 +27,7 @@ using GMap.NET.WindowsForms.ToolTips;
 using System.Threading;
 using BrightIdeasSoftware;
 using PokemonGo.RocketAPI.Helpers;
+using System.Collections;
 
 namespace PokemonGo.RocketAPI.Window
 {
@@ -1144,16 +1145,9 @@ namespace PokemonGo.RocketAPI.Window
 
         #region POKEMON LIST
         private IEnumerable<PokemonFamily> families;
-        private static int TransferButtonColumnIndex;
-        private static int PowerUpButtonColumnIndex;
-        private static int EvolveButtonColumnIndex;
 
         private void InitializePokemonForm()
         {
-            TransferButtonColumnIndex = 7;
-            PowerUpButtonColumnIndex = PowerUpButtonColumnIndex + 1;
-            EvolveButtonColumnIndex = EvolveButtonColumnIndex + 1;
-
             objectListView1.ButtonClick += PokemonListButton_Click;
 
             pkmnName.ImageGetter = delegate (object rowObject)
@@ -1182,7 +1176,15 @@ namespace PokemonGo.RocketAPI.Window
             };
 
             objectListView1.FormatRow += delegate (object sender, FormatRowEventArgs args) {
-                args.Item.Text = args.RowIndex.ToString();
+                args.Item.Text = (args.RowIndex + 1).ToString();
+            };
+
+            pkmnName.AspectGetter = delegate (object rowObject)
+            {
+                PokemonData pokemon = (PokemonData)rowObject;
+                if (pokemon.Nickname != "")
+                    return pokemon.Nickname;
+                return pokemon.PokemonId.ToString();
             };
         }
 
@@ -1250,15 +1252,15 @@ namespace PokemonGo.RocketAPI.Window
             try
             {
                 PokemonData pokemon = (PokemonData)e.Model;
-                if (e.ColumnIndex == TransferButtonColumnIndex)
+                if (e.Column == pkmnTransferButton)
                 {
                     TransferPokemon(pokemon);
                 }
-                else if (e.ColumnIndex == PowerUpButtonColumnIndex)
+                else if (e.Column == pkmnPowerUpButton)
                 {
                     PowerUpPokemon(pokemon);
                 }
-                else if (e.ColumnIndex == EvolveButtonColumnIndex)
+                else if (e.Column == pkmnEvolveButton)
                 {
                     EvolvePokemon(pokemon);
                 }
