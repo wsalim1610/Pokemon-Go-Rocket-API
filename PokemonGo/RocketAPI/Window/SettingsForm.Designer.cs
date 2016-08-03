@@ -417,9 +417,9 @@
             this.label6.AutoSize = true;
             this.label6.Location = new System.Drawing.Point(3, 220);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(70, 13);
+            this.label6.Size = new System.Drawing.Size(81, 13);
             this.label6.TabIndex = 21;
-            this.label6.Text = "IV Threshold:";
+            this.label6.Text = "IV % Threshold:";
             // 
             // SettingsForm
             // 

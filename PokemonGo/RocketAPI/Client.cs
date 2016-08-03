@@ -491,7 +491,7 @@ namespace PokemonGo.RocketAPI
             foreach (var item in items)
             {
                 var transfer = await RecycleItem((AllEnum.ItemId)item.Item_, item.Count);
-                ColoredConsoleWrite(ConsoleColor.DarkCyan, $"Recycled {item.Count}x {((AllEnum.ItemId)item.Item_).ToString().Substring(4)}");
+                ColoredConsoleWrite(ConsoleColor.DarkCyan, $"Recycled {item.Count}x {((AllEnum.ItemId)item.Item_).ToString().Substring(4)}. You have {_settings.ItemRecycleFilter.Single(f => f.Key == (AllEnum.ItemId)item.Item_).Value} left.");
                 await Task.Delay(500);
             }
             await Task.Delay(_settings.RecycleItemsInterval * 1000);

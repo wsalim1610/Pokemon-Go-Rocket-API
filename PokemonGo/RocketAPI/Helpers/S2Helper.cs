@@ -18,13 +18,17 @@ namespace PokemonGo.RocketAPI.Helpers
                 //.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent.Parent;
 
             nearbyCellIds.Add(cellId);
-            for (var i = 0; i < 10; i++)
+
+            List<S2CellId> neighbors = new List<S2CellId>();
+            cellId.GetAllNeighbors(15, neighbors);
+
+            foreach (var n in neighbors)
             {
-                nearbyCellIds.Add(GetPrevious(cellId, i));
-                nearbyCellIds.Add(GetNext(cellId, i));
+                nearbyCellIds.Add(n);
+                nearbyCellIds.AddRange(n.GetEdgeNeighbors());
             }
 
-            return nearbyCellIds.Select(c => c.Id).OrderBy(c => c).ToList();
+            return nearbyCellIds.Select(c => c.Id).Distinct().OrderBy(c => c).ToList();
         }
 
         private static S2CellId GetNext(S2CellId cellId, int depth)

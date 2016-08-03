@@ -190,7 +190,7 @@ namespace PokemonGo.RocketAPI.Window
                         await TransferAllWeakPokemon(botClient, ClientSettings.TransferCPThreshold);
                         break;
                     case "IV":
-                        await TransferAllGivenPokemons(botClient, pokemons, ClientSettings.TransferIVThreshold);
+                        await TransferAllGivenPokemons(botClient, pokemons, (float)Math.Round(ClientSettings.TransferIVThreshold / 100f, 2));
                         break;
                     default:
                         ColoredConsoleWrite(Color.DarkGray, "Transfering pokemon disabled");
@@ -434,7 +434,7 @@ namespace PokemonGo.RocketAPI.Window
                         await TransferAllWeakPokemon(client, ClientSettings.TransferCPThreshold);
                         break;
                     case "IV":
-                        await TransferAllGivenPokemons(client, pokemons2, ClientSettings.TransferIVThreshold);
+                        await TransferAllGivenPokemons(client, pokemons2, (float)Math.Round(ClientSettings.TransferIVThreshold / 100f, 2));
                         break;
                     default:
                         ColoredConsoleWrite(Color.DarkGray, "Transfering pokemon disabled");
@@ -526,6 +526,8 @@ namespace PokemonGo.RocketAPI.Window
         private async Task TryUnban(FortData pokeStop)
         {
             await locationManager.update(pokeStop.Latitude, pokeStop.Longitude);
+            UpdatePlayerLocationOnMap(pokeStop.Latitude, pokeStop.Longitude);
+            UpdateMap();
             var fortInfo = await botClient.GetFort(pokeStop.Id, pokeStop.Latitude, pokeStop.Longitude);
             var fortSearch = await botClient.SearchFort(pokeStop.Id, pokeStop.Latitude, pokeStop.Longitude);
             await TryUnban(pokeStop, fortInfo, fortSearch);
@@ -650,7 +652,7 @@ namespace PokemonGo.RocketAPI.Window
                     pokemonOfDesiredType.Skip(1) // keep the strongest one for potential battle-evolving
                         .ToList();
                 
-                await TransferAllGivenPokemons(client, unwantedPokemon);
+                await TransferAllGivenPokemons(client, unwantedPokemon, (float)Math.Round(ClientSettings.TransferIVThreshold / 100f, 2));
             }
         }
 
@@ -1186,6 +1188,21 @@ namespace PokemonGo.RocketAPI.Window
                     return pokemon.Nickname;
                 return pokemon.PokemonId.ToString();
             };
+
+            pkmnMove1.AspectGetter = delegate (object rowObject)
+            {
+                PokemonData pokemon = (PokemonData)rowObject;
+                string move = pokemon.Move1.ToString().Replace("Fast", "");
+                move = Regex.Replace(move, "([A-Z])", " $1", RegexOptions.Compiled).Trim();
+                return move;
+            };
+
+            pkmnMove2.AspectGetter = delegate (object rowObject)
+            {
+                PokemonData pokemon = (PokemonData)rowObject;
+                string move = Regex.Replace(pokemon.Move2.ToString(), "([A-Z])", " $1", RegexOptions.Compiled).Trim();
+                return move;
+            };
         }
 
         private static Image GetPokemonImage(int pokemonId)
@@ -1272,6 +1289,7 @@ namespace PokemonGo.RocketAPI.Window
         {
             if (MessageBox.Show($"Are you sure you want to transfer {pokemon.PokemonId.ToString()} with {pokemon.Cp} CP?", "Confirmation", MessageBoxButtons.YesNo) == DialogResult.Yes)
             {
+                objectListView1.Enabled = false;
                 var transferPokemonResponse = await pokemonListClient.TransferPokemon(pokemon.Id);
 
                 if (transferPokemonResponse.Status == 1)
@@ -1282,12 +1300,14 @@ namespace PokemonGo.RocketAPI.Window
                 else
                 {
                     ColoredConsoleWrite(Color.Magenta, $"{pokemon.PokemonId} could not be transferred");
+                    objectListView1.Enabled = true;
                 }
             }
         }
 
         private async void PowerUpPokemon(PokemonData pokemon)
         {
+            objectListView1.Enabled = false;
             var evolvePokemonResponse = await pokemonListClient.PowerUp(pokemon.Id);
 
             if (evolvePokemonResponse.Result == 1)
@@ -1298,11 +1318,13 @@ namespace PokemonGo.RocketAPI.Window
             else
             {
                 ColoredConsoleWrite(Color.Magenta, $"{pokemon.PokemonId} could not be upgraded");
+                objectListView1.Enabled = true;
             }
         }
 
         private async void EvolvePokemon(PokemonData pokemon)
         {
+            objectListView1.Enabled = false;
             var evolvePokemonResponse = await pokemonListClient.EvolvePokemon(pokemon.Id);
 
             if (evolvePokemonResponse.Result == 1)
@@ -1313,6 +1335,7 @@ namespace PokemonGo.RocketAPI.Window
             else
             {
                 ColoredConsoleWrite(Color.Magenta, $"{pokemon.PokemonId} could not be evolved");
+                objectListView1.Enabled = true;
             }
         }
 

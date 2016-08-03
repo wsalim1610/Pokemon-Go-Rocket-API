@@ -69,6 +69,7 @@ namespace PokemonGo.RocketAPI.Window
             //zoom min/max; default both = 2
             gMapControl1.DragButton = MouseButtons.Left;
             gMapControl1.IgnoreMarkerOnMouseWheel = true;
+            gMapControl1.DisableFocusOnMouseEnter = true;
 
             gMapControl1.CenterPen = new Pen(Color.Red, 2);
             gMapControl1.MinZoom = trackBar.Maximum = 1;
@@ -145,6 +146,7 @@ namespace PokemonGo.RocketAPI.Window
                 
                 if (e.Clicks == 1)
                 {
+                    PointLatLng prevMapPos = gMapControl1.Position;
                     double X = Math.Round(clickedCoord.Lng, 6);
                     double Y = Math.Round(clickedCoord.Lat, 6);
                     string longitude = X.ToString();
@@ -152,7 +154,7 @@ namespace PokemonGo.RocketAPI.Window
                     latitudeText.Text = latitude;
                     longitudeText.Text = longitude;
 
-                    moveTo(clickedCoord);
+                    gMapControl1.Position = prevMapPos;
                 }
             }
         }
@@ -230,7 +232,7 @@ namespace PokemonGo.RocketAPI.Window
 
             }
 
-            if (transferTypeCb.Text == "IV")
+            if (transferTypeCb.Text == "IV" || transferTypeCb.Text == "Leave Strongest")
             {
                 label6.Visible = true;
                 transferIVThresText.Visible = true;
